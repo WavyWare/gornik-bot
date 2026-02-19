@@ -21,11 +21,6 @@ await bot.api.setMyCommands([
     { command: "help", description: "Pokaż pomoc" },
 ]);
 
-// Suggestion: Add a status check feature (mocked for simplicity)
-const getStatus = (type: string) => {
-    return Math.random() > 0.1 ? "✅ Online" : "❌ Offline";
-};
-
 bot.command("start", async (ctx) => {
     const keyboard = new InlineKeyboard();
 
@@ -39,7 +34,6 @@ bot.command("start", async (ctx) => {
         }
     });
 
-    keyboard.text("📊 Status Serwerów", "check_status").row();
 
     await ctx.reply(
         "Witaj na bocie Gornika! 👋\n\nWybierz jedną z opcji poniżej, aby dowiedzieć się więcej o naszych usługach.",
@@ -57,26 +51,19 @@ bot.callbackQuery(/^info_(\d+)$/, async (ctx) => {
 
     await ctx.answerCallbackQuery();
 
-    // For non-web pages, we show the address/description. 
-    // Telegram will automatically make the link clickable in the message text.
-    await ctx.reply(
-        `📌 *${page.name}*\n\n${page.description}\n\n🔗 ADRES: \`${page.link}\``,
-        { parse_mode: "Markdown" }
-    );
+    // For non-web pages (TS3, Minecraft), we show the address.
+    // Telegram protocol support in buttons is limited, so we put the link in the message text.
+    let responseText = `📌 *${page.name}*\n\n${page.description}\n\n`;
+
+    if (page.type === 'ts3') {
+        responseText += `🚀 *KLIKNIJ ABY DOŁĄCZYĆ:*\n[${page.link}](${page.link})`;
+    } else {
+        responseText += `🔗 ADRES: \`${page.link}\``;
+    }
+
+    await ctx.reply(responseText, { parse_mode: "Markdown" });
 });
 
-bot.callbackQuery("check_status", async (ctx) => {
-    let statusMsg = "📊 *Aktualny status serwerów:*\n\n";
-
-    pages.forEach(page => {
-        statusMsg += `${page.name}: ${getStatus(page.type)}\n`;
-    });
-
-    await ctx.answerCallbackQuery();
-    await ctx.reply(statusMsg, { parse_mode: "Markdown" });
-});
-
-// Generalized help command
 bot.command("help", async (ctx) => {
     await ctx.reply(
         "Pomoc:\n" +
