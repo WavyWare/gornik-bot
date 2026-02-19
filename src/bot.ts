@@ -56,7 +56,7 @@ bot.callbackQuery(/^info_(\d+)$/, async (ctx) => {
     let responseText = `📌 *${page.name}*\n\n${page.description}\n\n`;
 
     if (page.type === 'ts3') {
-        responseText += `🚀 *KLIKNIJ ABY DOŁĄCZYĆ:*\n[${page.link}](${page.link})`;
+        responseText += `🚀 [KLIKNIJ, ABY WEJŚĆ NA SERWER](${page.link})`;
     } else {
         responseText += `🔗 ADRES: \`${page.link}\``;
     }
