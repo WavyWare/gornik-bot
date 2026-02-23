@@ -26,9 +26,12 @@ bot.command("start", async (ctx) => {
 
     pages.forEach((page, index) => {
         // Telegram supports only http/https and some internal protocols for URL buttons.
-        // For TS3 and Minecraft, we use a callback button to show info.
+        // For 'web' pages, we use a URL button.
         if (page.type === 'web') {
-            keyboard.url(page.name, page.link).row();
+            const username = ctx.from?.username || ctx.from?.first_name || "uzytkownik";
+            const separator = page.link.includes('?') ? '&' : '?';
+            const finalLink = `${page.link}${separator}username=${encodeURIComponent(username)}`;
+            keyboard.url(page.name, finalLink).row();
         } else {
             keyboard.text(page.name, `info_${index}`).row();
         }
@@ -55,11 +58,13 @@ bot.callbackQuery(/^info_(\d+)$/, async (ctx) => {
     // Telegram protocol support in buttons is limited, so we put the link in the message text.
     let responseText = `📌 *${page.name}*\n\n${page.description}\n\n`;
 
-    if (page.type === 'ts3') {
-        responseText += `🚀 [KLIKNIJ, ABY WEJŚĆ NA SERWER](${page.link})`;
-    } else {
-        responseText += `🔗 ADRES: \`${page.link}\``;
-    }
+    const username = ctx.from?.username || ctx.from?.first_name || "uzytkownik";
+    const separator = page.link.includes('?') ? '&' : '?';
+    const finalLink = page.type === 'web'
+        ? `${page.link}${separator}username=${encodeURIComponent(username)}`
+        : page.link;
+
+    responseText += `🔗 ADRES: \`${finalLink}\``;
 
     await ctx.reply(responseText, { parse_mode: "Markdown" });
 });
@@ -75,8 +80,13 @@ bot.command("help", async (ctx) => {
 
 bot.command("pages", async (ctx) => {
     let response = "📄 *Dostępne strony i serwery:*\n\n";
+    const username = ctx.from?.username || ctx.from?.first_name || "uzytkownik";
     pages.forEach(page => {
-        response += `🔹 *${page.name}*\n_${page.description}_\nLink: ${page.link}\n\n`;
+        const separator = page.link.includes('?') ? '&' : '?';
+        const finalLink = page.type === 'web'
+            ? `${page.link}${separator}username=${encodeURIComponent(username)}`
+            : page.link;
+        response += `🔹 *${page.name}*\n_${page.description}_\nLink: ${finalLink}\n\n`;
     });
     await ctx.reply(response, { parse_mode: "Markdown" });
 });

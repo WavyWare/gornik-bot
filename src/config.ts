@@ -1,4 +1,4 @@
-export type PageType = 'web' | 'ts3' | 'minecraft';
+export type PageType = 'web' | 'minecraft';
 
 export interface Page {
     name: string;
@@ -17,8 +17,8 @@ export const pages: Page[] = [
     {
         name: "Serwer TeamSpeak 3",
         description: "Kliknij, aby połączyć się z naszym komunikatorem głosowym.",
-        link: "ts3server://teamspeak.gornik.edu.pl",
-        type: "ts3"
+        link: "https://teamspeak.gornik.edu.pl",
+        type: "web"
     },
     {
         name: "Konwerter plików",
